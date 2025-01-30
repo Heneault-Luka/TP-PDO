@@ -1,8 +1,8 @@
 <?php include "header.php";
 $action=$_GET['action']; // soit Ajouter ou Modifier
+include "connexionPdo.php";
 
 if($action == "Modifier"){
-    include "connexionPdo.php";
     $num=$_GET['num'];
     $req=$monPdo->prepare("select * from nationalite where num= :num");
     $req->setFetchMode(PDO::FETCH_OBJ);
@@ -10,7 +10,11 @@ if($action == "Modifier"){
     $req->execute();
     $laNationalite=$req->fetch();
 }
-
+    // liste des continents
+    $reqContinent=$monPdo->prepare("select * from continent");
+    $reqContinent->setFetchMode(PDO::FETCH_OBJ);
+    $reqContinent->execute();
+    $lesContinent=$reqContinent->fetchALL();
 ?>
 <div class="container mt-5">
     <h2 class='pt-3 text-center'><?php echo $action ?> une nationalité</h2>
@@ -18,6 +22,17 @@ if($action == "Modifier"){
         <div class="form-group">
             <label for="libelle"> Libellé</label>
             <input type="text" class='form-control' id='libelle' placehorder='Saisir le libellé' name='libelle' value="<?php if($action == "Modifier") {echo $laNationalite->libelle;} ?>">
+        </div>
+        <div class="form-group">
+            <label for="continent"> Libellé</label>
+            <select name="continent" class="form-control">
+                <?php
+                foreach($lesContinent as $continent){
+                    $selection=$continent->num == $laNationalite-> numContinent ? 'selected' : '';
+                    echo "<option value='$continent->num' $selection>$continent->libelle</option>";
+                }
+                ?>
+            </select>
         </div>
         <input type="hidden" id="num" name="num" value="<?php if($action == "Modifier") {echo $laNationalite->num;} ?>">
         <div class="row">

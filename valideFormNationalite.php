@@ -3,15 +3,18 @@
   $action=$_GET['action'];
   $num = $_POST['num']; // je récupère le libelle du forulaire
   $libelle = $_POST['libelle']; // je récupère le libelle du forulaire
+  $continent = $_POST['continent']; // je récupère le continent du forulaire
 
   if($action == "Modifier"){
-    $req=$monPdo->prepare("update nationalite set libelle = :libelle where num = :num");
+    $req=$monPdo->prepare("update nationalite set libelle = :libelle, numContinent= :continent where num = :num");
     $req->bindParam(':num', $num);
     $req->bindParam(':libelle', $libelle);
+    $req->bindParam(':continent', $continent);
     $nb=$req->execute();
   }else{
-    $req=$monPdo->prepare("insert into nationalite(libelle) values(:libelle)");
+    $req=$monPdo->prepare("insert into nationalite(libelle, numContinent) values(:libelle, :continent)");
     $req->bindParam(':libelle', $libelle);
+    $req->bindParam(':continent', $continent);
   }
   $nb=$req->execute();
   $message=$action== "Modifier" ? "modifiée" : "ajoutée";
