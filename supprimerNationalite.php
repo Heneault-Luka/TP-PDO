@@ -17,5 +17,4 @@
   }
   header('location: listeNationalites.php');
   exit();
-  dqdq
 ?>
