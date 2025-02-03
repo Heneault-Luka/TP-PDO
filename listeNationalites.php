@@ -1,7 +1,19 @@
 <?php include "header.php";
 include "connexionPdo.php";
 // liste des nationalités
-$req=$monPdo->prepare("select n.num, n.libelle as 'libNation', c.libelle as 'libContinent' from nationalite n, continent c where n.numContinent=c.num order by n.libelle");
+$libelle="";
+$continentSel="Tous";
+// Construction de la requête
+$textReq="select n.num, n.libelle as 'libNation', c.libelle as 'libContinent' from nationalite n, continent c where n.numContinent=c.num";
+if(!empty($_GET)){
+    $libelle=$_GET['libelle'];
+    $continentSel=$_GET['continent'];
+    if($libelle != ""){ $textReq.= " and n.libelle like '%" .$libelle."%'";}
+    if($continentSel != "Tous"){ $textReq.= " and c.num =" .$continentSel;}
+}
+$textReq.=" order by n.libelle";
+
+$req=$monPdo->prepare($textReq);
 $req->setFetchMode(PDO::FETCH_OBJ);
 $req->execute();
 $lesNationalites=$req->fetchALL();
@@ -37,15 +49,16 @@ if(!empty($_SESSION['message'])){
         <form action="" method="get" class="border border-primary rounded p-3 mt-3 mb-3">
             <div class="row">
                 <div class="col">
-                <input type="text" class='form-control' id='libelle' placehorder='Saisir le libellé' name='libelle' value="<?php if($action == "Modifier") {echo $laNationalite->libelle;} ?>">
+                <input type="text" class='form-control' id='libelle' placehorder='Saisir le libellé' name='libelle' value="<?php echo $libelle; ?> ">
                 </div>
                 <div class="col">
                     <select name="continent" class="form-control">
                         <?php
-                        foreach($lesContinent as $continent){
-                            $selection=$continent->num == $laNationalite-> numContinent ? 'selected' : '';
-                            echo "<option value='$continent->num' $selection>$continent->libelle</option>";
-                        }
+                            echo "<option value='Tous'>Tous les contienets</option>";
+                            foreach($lesContinent as $continent){
+                                $selection=$continent->num == $continentSel ? 'selected' : '';
+                                echo "<option value='$continent->num' $selection>$continent->libelle</option>";
+                            }
                         ?>
                     </select>
                 </div>
